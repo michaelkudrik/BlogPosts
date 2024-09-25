@@ -1,0 +1,75 @@
+---
+title: "A web scraper for tea"
+date: "2023-05-23"
+tags: ["Tea", "Programming","Python"]
+---
+
+# How I made a program to scrape the web for tea
+
+## The Purpose
+The reason I made this program was to learn how to scrape things on the web. In the future, I would like to make a web application related to brewing tea (A hobby of mine). The goal of this program is to parse a website and scrape out the names of different teas. In this example, I structured it to output to a text file.
+
+## Resources Used
+#### Selenium on Python 
+To create this program, I used a suite of tools for automating web browsers called Selenium. The Selenium WebDriver allows users to create automation across multiple different environments. In this case, we will be making a program that reads the html of a website and records it. 
+#### Chrome Developer Tools
+This goes without saying, but you will need some way to analyze the html of the website you are scraping. I will be using the developer panel provided on Chrome browsers. 
+
+## Set Up
+1. Install Selenium 
+```python
+pip install selenium
+```
+2. [Install WebDrivers](https://www.selenium.dev/documentation/webdriver/)
+3. Import Needed Libraries
+```python
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+```
+
+## The Code
+After importing the necessary Libraries, we need to set the url and driver. I chose to use the website steepster.com to act as the site being scraped. The reason the link begins on page 13, is to remove any fluctuation when it comes to class or XPATH of the next button. 
+```python
+url = 'https://steepster.com/teas?page=13&sort=rating'
+driver = webdriver.Chrome()
+driver.get(url)
+```
+Below is the rest of the code needed. 
+```python
+with open('output.txt', 'a', encoding='utf-8') as file:
+    while True:
+        teas = driver.find_elements(By.CLASS_NAME, 'tea')
+        for tea in teas:
+            name = tea.find_element(By.CLASS_NAME, 'tea-name').text
+            entry = tea.find_element(By.CLASS_NAME, 'entry-count').text
+
+            try:
+                rating = tea.find_element(By.XPATH, '/html/body/div[5]/div[1]/div/div/div[2]/div/div').text
+            except NoSuchElementException:
+                rating = 'N/A'
+
+            file.write(f'{name} {rating} {entry}\n')
+        try:
+            next_button = driver.find_element(By.XPATH, '/html/body/div[5]/div[1]/div/nav/ul/li[13]/a')
+            if next_button:
+                next_button.click()
+                WebDriverWait(driver, 10).until(EC.staleness_of(teas[0]))
+            else:
+                break
+        except NoSuchElementException:
+            break
+```
+In the first line is where I created a text file to store the scraped text. Next I created a while loop which is used to find the container which has the elements we are looking to scrape. In our case, the names of the tea and their entry count were in an element named 'tea'.
+<CustomImage src="https://raw.githubusercontent.com/michael-kudrik/BlogPosts/main/images/TeaScrape1.jpg" alt="Explanation of element locations"/>
+
+Next, to extract the rating, we use a try-except block. We attempt to find the rating element using the specified XPath. If the element is not found, we assign a 'N/A' value to the rating variable.  
+
+By now you should have noticed that in order to scrape an element we assign a variable and then use the .find_element method which uses XPATH & CLASS_NAME to locate the item we would like to scrape.  
+
+Finally, we use another try-except block to handle finding the next button element. If the next button is found, we click it and wait for the page to load using WebDriverWait and the staleness_of condition on the first tea element. If the next button is not found, we break out of the loop.  
+
+<CustomImage src="https://raw.githubusercontent.com/michael-kudrik/BlogPosts/main/images/TeaScrape2.jpg" alt="Text file containing tea names"/>
+This program is not perfect and has a few flaws such as getting two of the same texts as an output. In order to allow it to be most suited for your personal project, you can also choose to output your scraped text into a .csv file or a .json document. 
+

@@ -1,0 +1,44 @@
+---
+title: "How To Fix 'user is not in the sudoers file' [Pop!_OS Dual Boot]"
+date: "2023-07-6"
+tags: ["Programming","Linux","Fixes"]
+---
+# The Issue
+When attempting to sudo you are met with the disheartening response of *"Username is not in the sudoers file. This incident will be reported."* There are many fixes online, and most of them involve entering into a root shell some other way. We will be doing that in this tutorial. There are many different ways to arrive at that point, but mine will be specifically for anyone using **systemd-boot**. 
+# The Solution
+1. Reboot your system.
+2. Highlight the "Pop!_OS" entry and press the "e" key to edit the boot parameters.
+3. Look for the line of text at the bottom of the screen and locate the part that includes "quiet" or "splash". Remove these words from the line.
+4. Add the following at the end of the line: ***"systemd.unit=rescue.target"***.
+5. Press Enter to apply the changes.
+6. Once in press Enter again to enter maintenance.
+
+<CustomImage src="https://raw.githubusercontent.com/michael-kudrik/BlogPosts/main/images/SystemdSudoBoot.jpg"alt="Explanation of bootloader steps"/>
+
+You should now be in root mode, and you should have a #.
+
+*OPTIONAL STEP*: reset sudo password.
+
+```
+passwd root
+```
+7. Edit the sudoers file by typing: 
+```
+visudo
+```
+8. Locate the line that starts with %sudo or %admin. This line grants sudo privileges to users in the "sudo" or "admin" group.
+9. Uncomment the line (remove the '#' character at the beginning of the line) if it's commented out.
+10. If your user is not a member of the "sudo" or "admin" group, you can add your username to the line. For example, it should look like %sudo ALL=(ALL:ALL) ALL or %admin ALL=(ALL:ALL) ALL.
+11. Save and Exit (Ctrl+X and then Y).
+## If the above does not work, do the following.
+1. Repeat up to step 6 if not already in root mode.
+2. Verify your user's group membership by running the command id your_username. Replace your_username with your actual username.
+3. Check if your username is listed under the "sudo" or "admin" group. The output of the id command should display the groups your user is a member of.
+4. If your username is not listed in the "sudo" or "admin" group, you can add it to the appropriate group by running the command ```usermod -aG sudo your_username```. Replace your_username with your actual username. If you're using the "admin" group instead of "sudo," modify the command accordingly (usermod -aG admin your_username).
+5. Once you've added your username to the group, you can exit the root terminal by typing exit.
+
+
+
+
+
+
