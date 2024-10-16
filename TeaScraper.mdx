@@ -62,7 +62,7 @@ with open('output.txt', 'a', encoding='utf-8') as file:
             break
 ```
 In the first line is where I created a text file to store the scraped text. Next I created a while loop which is used to find the container which has the elements we are looking to scrape. In our case, the names of the tea and their entry count were in an element named 'tea'.
-<CustomImage src="https://raw.githubusercontent.com/michael-kudrik/BlogPosts/main/images/TeaScrape1.jpg" alt="Explanation of element locations"/>
+<CustomImage src="https://raw.githubusercontent.com/michaelkudrik/BlogPosts/main/images/TeaScrape1.jpg" alt="Explanation of element locations"/>
 
 Next, to extract the rating, we use a try-except block. We attempt to find the rating element using the specified XPath. If the element is not found, we assign a 'N/A' value to the rating variable.  
 
@@ -70,6 +70,6 @@ By now you should have noticed that in order to scrape an element we assign a va
 
 Finally, we use another try-except block to handle finding the next button element. If the next button is found, we click it and wait for the page to load using WebDriverWait and the staleness_of condition on the first tea element. If the next button is not found, we break out of the loop.  
 
-<CustomImage src="https://raw.githubusercontent.com/michael-kudrik/BlogPosts/main/images/TeaScrape2.jpg" alt="Text file containing tea names"/>
+<CustomImage src="https://raw.githubusercontent.com/michaelkudrik/BlogPosts/main/images/TeaScrape2.jpg" alt="Text file containing tea names"/>
 This program is not perfect and has a few flaws such as getting two of the same texts as an output. In order to allow it to be most suited for your personal project, you can also choose to output your scraped text into a .csv file or a .json document. 
 
